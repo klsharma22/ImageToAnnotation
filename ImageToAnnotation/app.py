@@ -17,3 +17,5 @@ class App(tk.Tk):
 
 app = App()
 app.mainloop()
+
+#got it on github and on my mac mini. I hope I can work anywhere I want.
