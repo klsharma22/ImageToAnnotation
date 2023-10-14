@@ -20,14 +20,19 @@ class App:
             self.ymin_label.place(relx=0.05, rely=0.125)
             self.ymax_label.place(relx=0.25, rely=0.125)
 
-            frame = tk.Frame(self.root, width= 500, height= 500)
-            frame.place(relx=0.05, rely=0.2)
+            self.canvas = tk.Canvas(self.root, width= 800, height= 600)
+            self.canvas.place(relx=0.05, rely=0.2)
 
-            frame.bind('<Motion>', self.mouse_coordinate)
+            self.canvas.bind('<Button-1>', self.mouse_init)
+            self.canvas.bind('<B1-Motion>', self.mouse_final)
 
-      def mouse_coordinate(self, event):
+      def mouse_init(self, event):
             self.xmin_label.config(text= f"{event.x}")
             self.ymin_label.config(text= f"{event.y}")
+
+      def mouse_final(self, event):
+            self.xmax_label.config(text= f"{event.x}")
+            self.ymax_label.config(text= f"{event.y}")
 
 
 
