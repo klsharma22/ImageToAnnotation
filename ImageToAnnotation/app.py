@@ -15,7 +15,11 @@ class App(tk.Tk):
             else:
                   logging.error("Labels have not been initiated successfully.")
 
+            xmin_label.place(relx=0.2, rely=0.1)
+            xmax_label.place(relx=0.66, rely=0.1)
+            ymin_label.place(relx=0.2, rely= 0.4)
+            ymax_label.place(relx=0.66, rely=0.4)
+
+
 app = App()
 app.mainloop()
-
-#got it on github and on my mac mini. I hope I can work anywhere I want.
