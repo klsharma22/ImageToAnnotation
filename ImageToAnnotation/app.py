@@ -58,7 +58,7 @@ class App:
                   )
 
       def load_image(self):
-            
+            pass
       
 
 

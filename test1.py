@@ -7,4 +7,4 @@ def load_images():
 
     return file_paths
 
-load_images()
+print(load_images())
