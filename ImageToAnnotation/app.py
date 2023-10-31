@@ -24,15 +24,28 @@ class App:
             self.canvas.place(relx=0.05, rely=0.2)
 
             self.canvas.bind('<Button-1>', self.mouse_init)
-            self.canvas.bind('<B1-Motion>', self.mouse_final)
+            self.canvas.bind('<B1-Motion>', self.create_box)
+
+            self.start_pos = None
+            self.final_pos = None
+            self.current_box = None
 
       def mouse_init(self, event):
-            self.xmin_label.config(text= f"{event.x}")
-            self.ymin_label.config(text= f"{event.y}")
+            self.start_pos = (event.x, event.y)
+            self.xmin_label.config(text= f"{self.start_pos[0]}")
+            self.ymin_label.config(text= f"{self.start_pos[1]}")
 
-      def mouse_final(self, event):
-            self.xmax_label.config(text= f"{event.x}")
-            self.ymax_label.config(text= f"{event.y}")
+      def create_box(self, event):
+            self.final_pos = (event.x, event.y)
+            self.xmax_label.config(text=f"{self.final_pos[0]}")
+            self.ymax_label.config(text= f"{self.final_pos[1]}")
+            if self.start_pos:
+                  if self.current_box:
+                        self.canvas.delete(self.current_box)
+                  self.current_box = self.canvas.create_rectangle(
+                        self.start_pos[0], self.start_pos[1], self.final_pos[0], self.final_pos[1], outline= 'red'
+                  )
+      
 
 
 
