@@ -16,11 +16,11 @@ class App:
                   logging.error("Labels have not been initiated successfully.")
 
             self.xmin_label.place(relx=0.05, rely=0.025)
-            self.xmax_label.place(relx=0.25, rely=0.025)
-            self.ymin_label.place(relx=0.05, rely=0.125)
-            self.ymax_label.place(relx=0.25, rely=0.125)
+            self.xmax_label.place(relx=0.15, rely=0.025)
+            self.ymin_label.place(relx=0.05, rely=0.045)
+            self.ymax_label.place(relx=0.15, rely=0.045)
 
-            self.canvas = tk.Canvas(self.root, width= 800, height= 600)
+            self.canvas = tk.Canvas(self.root, width= 900, height= 700, bg= "white")
             self.canvas.place(relx=0.05, rely=0.2)
 
             self.canvas.bind('<Button-1>', self.mouse_init)
