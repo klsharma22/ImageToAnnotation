@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 import logging
 
 class App:
@@ -40,6 +41,7 @@ class App:
             self.start_pos = None
             self.final_pos = None
             self.current_box = None
+            self.file_path_list = None
 
       def mouse_init(self, event):
             self.start_pos = (event.x, event.y)
@@ -57,8 +59,8 @@ class App:
                         self.start_pos[0], self.start_pos[1], self.final_pos[0], self.final_pos[1], outline= 'red'
                   )
 
-      def load_image(self):
-            pass
+      def track_files(self):
+            file_paths = filedialog.askdirectory()
       
 
 
