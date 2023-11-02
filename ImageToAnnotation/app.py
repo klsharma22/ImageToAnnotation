@@ -4,7 +4,7 @@ from tkinter import filedialog
 import logging
 import os
 import glob
-import cv2
+from PIL import Image, ImageTk      
 
 class App:
       def __init__(self, root):
@@ -66,6 +66,7 @@ class App:
                   self.current_box = self.canvas.create_rectangle(
                         self.start_pos[0], self.start_pos[1], self.final_pos[0], self.final_pos[1], outline= 'red'
                   )
+            self.root.update_idletasks()
 
       def track_files(self):
             dir_path= filedialog.askdirectory()
@@ -78,14 +79,16 @@ class App:
                         [img_paths.append(e) for e in glob.glob(files)]
 
                   self.file_path_list = img_paths
-                  print("All images collected.")
+                  self.root.update_idletasks()
             else:
                   raise FileNotFoundError
 
       def next_image(self):
             if self.index < len(self.file_path_list):
-                  print(self.file_path_list[self.index])
+                  self.image = ImageTk.PhotoImage(Image.open(self.file_path_list[self.index]))
+                  self.canvas.create_image(0.5, 0.5, anchor= "center", image= self.image)
                   self.index += 1
+
             
 
 
