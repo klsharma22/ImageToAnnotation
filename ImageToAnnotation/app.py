@@ -5,12 +5,13 @@ import logging
 import os
 import glob
 from PIL import Image, ImageTk      
+import cv2
 
 class App:
       def __init__(self, root):
             self.root = root
             logging.basicConfig(filename= 'app.log', filemode= 'w', format=' %(name)s - %(levelname)s - %(message)s')
-            self.root.geometry("1000x1000")
+            self.root.geometry("700x700")
 
             self.xmin_label, self.xmax_label = ttk.Label(self.root, text= "xmin"), ttk.Label(self.root, text= "xmax")
             self.ymin_label, self.ymax_label = ttk.Label(self.root, text= "ymin"), ttk.Label(self.root, text= "ymax")
@@ -38,7 +39,7 @@ class App:
             self.ymin_value.place(relx=0.2, rely=0.045)
             self.ymax_value.place(relx=0.3, rely=0.045)
 
-            self.canvas = tk.Canvas(self.root, width= 900, height= 700, bg= "white")
+            self.canvas = tk.Canvas(self.root, width= 416, height= 416, bg= "white")
             self.canvas.place(relx=0.05, rely=0.1)
 
             self.canvas.bind('<Button-1>', self.mouse_init)
@@ -85,7 +86,8 @@ class App:
 
       def next_image(self):
             if self.index < len(self.file_path_list):
-                  self.image = ImageTk.PhotoImage(Image.open(self.file_path_list[self.index]))
+                  self.image = Image.fromarray(self.resize(self.file_path_list[self.index]))
+                  self.image = ImageTk.PhotoImage(self.image)
                   self.canvas.create_image(0.5, 0.5, anchor= "center", image= self.image)
                   self.index += 1
 
