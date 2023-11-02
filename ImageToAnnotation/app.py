@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import logging
+import os
+import glob
+import cv2
 
 class App:
       def __init__(self, root):
@@ -15,7 +18,10 @@ class App:
             self.xmin_value, self.xmax_value = ttk.Label(self.root, text= "0"), ttk.Label(self.root, text= "0")
             self.ymin_value, self.ymax_value = ttk.Label(self.root, text= "0"), ttk.Label(self.root, text= "0")
 
-            self.load_btn = tk.Button(self.root, text= "Load Image", command= self.load_image)
+            self.load_btn = tk.Button(self.root, text= "Load Image", command= self.track_files)
+            self.load_btn.place(relx=0.35, rely= 0.025)
+            self.next_btn = tk.Button(self.root, text= "Next", command=self.next_image)
+            self.next_btn.place(relx= 0.5, rely= 0.025)
 
             if self.xmin_value and self.xmax_value and self.ymin_value and self.ymax_value:
                   logging.info("Labels have been initiated successfully.")
@@ -42,6 +48,8 @@ class App:
             self.final_pos = None
             self.current_box = None
             self.file_path_list = None
+            self.image = None
+            self.index = 0
 
       def mouse_init(self, event):
             self.start_pos = (event.x, event.y)
@@ -60,7 +68,27 @@ class App:
                   )
 
       def track_files(self):
-            file_paths = filedialog.askdirectory()
+            dir_path= filedialog.askdirectory()
+
+            if dir_path:
+                  img_paths = []
+                  for folder in os.listdir(dir_path):
+                        folder = os.path.join(dir_path, folder)
+                        files = os.path.join(folder, "*.jpg")
+                        [img_paths.append(e) for e in glob.glob(files)]
+
+                  self.file_path_list = img_paths
+                  print("All images collected.")
+            else:
+                  raise FileNotFoundError
+
+      def next_image(self):
+            if self.index < len(self.file_path_list):
+                  print(self.file_path_list[self.index])
+                  self.index += 1
+            
+
+
       
 
 
