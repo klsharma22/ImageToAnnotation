@@ -7,9 +7,6 @@ import glob
 def track_files():
     dir_path= filedialog.askdirectory()
 
-    return dir_path
-
-def load_images(dir_path):
     if dir_path:
         img_paths = {}
         for folder in os.listdir(dir_path):
@@ -21,10 +18,19 @@ def load_images(dir_path):
     else:
         raise FileNotFoundError
 
+def load_images(file_path):
+    for key in file_path.keys():
+        for img_path in file_path[key]:
+            img = cv2.imread(img_path)
+            cv2.imshow(key, img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+    
 
-directory_path = track_files()
 
-print(load_images(directory_path).keys())
+image_path = track_files()
+
+print(load_images(image_path))
 '''
 try:
     counter = 0
