@@ -61,6 +61,22 @@ class App:
             self.xmin_value.config(text= f"{self.start_pos[0]}")
             self.ymin_value.config(text= f"{self.start_pos[1]}")
 
+      def resize_image(self, img):
+            img_height, img_width,  _ = img.shape
+            canvas_aspect_ratio = self.canvas.winfo_width() / self.canvas.winfo_height()
+            image_aspect_ratio = img_width / img_height
+
+            if canvas_aspect_ratio > image_aspect_ratio:
+                  new_width = self.canvas.winfo_width()
+                  new_height = int(self.canvas.winfo_width() / image_aspect_ratio)
+            else:
+                  new_height = self.canvas.winfo_height()
+                  new_width = int(self.canvas.winfo_height() * image_aspect_ratio)
+
+            resized_img = cv.resize(img, (new_width, new_height))
+
+            return resized_img
+
       def create_box(self, event):
             self.final_pos = (event.x, event.y)
             self.xmax_value.config(text=f"{self.final_pos[0]}")
@@ -75,7 +91,7 @@ class App:
 
       def load_images(self):
             for f in self.file_path_list:
-                  img = Image.fromarray(cv.imread(f))
+                  img = Image.fromarray(self.resize_image(cv.imread(f)))
                   img = ImageTk.PhotoImage(img)
                   self.image.append(img)
             self.image_loading_complete.set()
