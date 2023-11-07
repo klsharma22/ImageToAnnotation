@@ -5,7 +5,9 @@ import logging
 import os
 import glob
 from PIL import Image, ImageTk      
-import cv2
+import cv2 as cv
+import threading
+import time
 
 class App:
       def __init__(self, root):
@@ -48,9 +50,11 @@ class App:
             self.start_pos = None
             self.final_pos = None
             self.current_box = None
-            self.file_path_list = None
-            self.image = None
+            self.current_image = None
+            self.file_path_list = []
+            self.image = []
             self.index = 0
+            self.image_loading_complete = threading.Event()
 
       def mouse_init(self, event):
             self.start_pos = (event.x, event.y)
@@ -69,6 +73,15 @@ class App:
                   )
             self.root.update_idletasks()
 
+      def load_images(self):
+            for f in self.file_path_list:
+                  img = Image.fromarray(cv.imread(f))
+                  img = ImageTk.PhotoImage(img)
+                  self.image.append(img)
+            self.image_loading_complete.set()
+            print(len(self.image))
+            self.root.after(0, self.next_btn.config(state= 'active'))
+
       def track_files(self):
             dir_path= filedialog.askdirectory()
 
@@ -77,27 +90,27 @@ class App:
                   for folder in os.listdir(dir_path):
                         folder = os.path.join(dir_path, folder)
                         files = os.path.join(folder, "*.jpg")
-                        [img_paths.append(e) for e in glob.glob(files)]
-
-                  self.file_path_list = img_paths
+                        print(f"Loading {folder}")
+                        [self.file_path_list.append(e) for e in glob.glob(files)]
+                        
+                  self.next_btn.config(state= 'disabled')
+                  threading.Thread(target= self.load_images).start()
+                  self.image_loading_complete.clear()
                   self.root.update_idletasks()
             else:
                   raise FileNotFoundError
 
       def next_image(self):
-            if self.index < len(self.file_path_list):
-                  self.image = Image.fromarray(self.resize(self.file_path_list[self.index]))
-                  self.image = ImageTk.PhotoImage(self.image)
-                  self.canvas.create_image(0.5, 0.5, anchor= "center", image= self.image)
+            self.image_loading_complete.wait()
+            if self.index < len(self.image):
+                  if self.current_image:
+                        self.canvas.delete("image")
+                  self.current_image = self.image[self.index]
+                  self.canvas.create_image(0.5, 0.5, anchor= "center", image= self.current_image, tag= "image")
                   self.index += 1
-
             
 
-
-      
-
-
-
+            
 
 if __name__ == '__main__':
       root = tk.Tk()
