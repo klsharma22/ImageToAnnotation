@@ -8,6 +8,8 @@ from PIL import Image, ImageTk
 import cv2 as cv
 import threading
 import time
+import numpy as np
+
 
 class App:
       def __init__(self, root):
@@ -25,6 +27,19 @@ class App:
             self.load_btn.place(relx=0.35, rely= 0.025)
             self.next_btn = tk.Button(self.root, text= "Next", command=self.next_image)
             self.next_btn.place(relx= 0.5, rely= 0.025)
+
+            self.progress_label = tk.Label(self.root, text= "0%")
+            self.progress_label.place(relx=0.05, rely=0.9)
+
+            self.object_text = tk.Entry(self.root)
+            self.object_text.place(relx= 0.7, rely=0.1)
+
+            self.save_btn = tk.Button(self.root, text= 'Save', command= self.save)
+            self.save_btn.place(relx=0.7, rely=0.15)
+
+            self.saved_status_label = tk.Label(self.root, text= "")
+            self.saved_status_label.place(relx= 0.7, rely=0.2)
+
 
             if self.xmin_value and self.xmax_value and self.ymin_value and self.ymax_value:
                   logging.info("Labels have been initiated successfully.")
@@ -56,26 +71,38 @@ class App:
             self.index = 0
             self.image_loading_complete = threading.Event()
 
+      def save(self):
+            self.saved_status_label.config(text= 'Saved')
+
+
       def mouse_init(self, event):
             self.start_pos = (event.x, event.y)
             self.xmin_value.config(text= f"{self.start_pos[0]}")
             self.ymin_value.config(text= f"{self.start_pos[1]}")
 
       def resize_image(self, img):
+            canvas_height, canvas_width = 416, 416
             img_height, img_width,  _ = img.shape
-            canvas_aspect_ratio = self.canvas.winfo_width() / self.canvas.winfo_height()
-            image_aspect_ratio = img_width / img_height
+            width_scale = canvas_width / img_width
+            height_scale = canvas_height / img_height
 
-            if canvas_aspect_ratio > image_aspect_ratio:
-                  new_width = self.canvas.winfo_width()
-                  new_height = int(self.canvas.winfo_width() / image_aspect_ratio)
-            else:
-                  new_height = self.canvas.winfo_height()
-                  new_width = int(self.canvas.winfo_height() * image_aspect_ratio)
+            # Determine the scaling factor to maintain the aspect ratio
+            scaling_factor = min(width_scale, height_scale)
 
-            resized_img = cv.resize(img, (new_width, new_height))
+            # Calculate the new size to maintain the aspect ratio
+            new_width = int(img_width * scaling_factor)
+            new_height = int(img_height * scaling_factor)
 
-            return resized_img
+            # Resize the image while maintaining the aspect ratio
+            resized_image = cv.resize(img, (new_width, new_height))
+
+            # Create a new image with the target size and paste the resized image in the center
+            output_image = np.full((canvas_height, canvas_width, 3), 255, dtype=np.uint8)
+            x_offset = (canvas_width - new_width) // 2
+            y_offset = (canvas_height - new_height) // 2
+            output_image[y_offset:y_offset + new_height, x_offset:x_offset + new_width] = resized_image
+
+            return output_image
 
       def create_box(self, event):
             self.final_pos = (event.x, event.y)
@@ -90,10 +117,20 @@ class App:
             self.root.update_idletasks()
 
       def load_images(self):
-            for f in self.file_path_list:
-                  img = Image.fromarray(self.resize_image(cv.imread(f)))
+            for i, f in enumerate(self.file_path_list):
+                  img = cv.imread(f)
+                  img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+                  img = Image.fromarray(self.resize_image(img))
                   img = ImageTk.PhotoImage(img)
                   self.image.append(img)
+
+                  value = (i + 1) * 100 / len(self.file_path_list)
+                  if value == 100:
+                        self.progress_label.config(text= "Completed")
+                  else:
+                        self.progress_label.config(text=f"{round(value, 2)}%")
+                  self.root.update_idletasks()
+
             self.image_loading_complete.set()
             print(len(self.image))
             self.root.after(0, self.next_btn.config(state= 'active'))
@@ -118,11 +155,12 @@ class App:
 
       def next_image(self):
             self.image_loading_complete.wait()
+            self.saved_status_label.config(text=" ")
             if self.index < len(self.image):
                   if self.current_image:
                         self.canvas.delete("image")
                   self.current_image = self.image[self.index]
-                  self.canvas.create_image(0.5, 0.5, anchor= "center", image= self.current_image, tag= "image")
+                  self.canvas.create_image(209, 209, image= self.current_image, tag= "image")
                   self.index += 1
             
 

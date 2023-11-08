@@ -4,41 +4,40 @@ from tkinter import filedialog
 import os
 import glob
 
-def track_files():
-    dir_path= filedialog.askdirectory()
+path = '/Users/klsharma22/Desktop/NextGenTechInc/Object Detection/Model/Custom-made/data/gerenuk/image_0032.jpg'
 
-    if dir_path:
-        img_paths = {}
-        for folder in os.listdir(dir_path):
-            folder = os.path.join(dir_path, folder)
-            files = os.path.join(folder, "*.jpg")
-            img_paths.update({folder.split('/')[-1] : glob.glob(files)})
+import cv2
+import numpy as np
 
-        return img_paths
-    else:
-        raise FileNotFoundError
+# Read the original image
+original_image = cv2.imread(path)
 
-def load_images(file_path):
-    for key in file_path.keys():
-        for img_path in file_path[key]:
-            img = cv2.imread(img_path)
-            cv2.imshow(key, img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-    
+# Calculate the target size (416x416)
+target_size = (416, 416)
 
+# Get the original image dimensions
+original_height, original_width, _ = original_image.shape
 
-image_path = track_files()
+# Calculate the scaling factors for both dimensions
+width_scale = target_size[0] / original_width
+height_scale = target_size[1] / original_height
 
-print(load_images(image_path))
-'''
-try:
-    counter = 0
-    for path in file_path_list:
-        load_images(path)
-        counter += 1
+# Determine the scaling factor to maintain the aspect ratio
+scaling_factor = min(width_scale, height_scale)
 
-    print(f"{counter} files were loaded.")
-except FileNotFoundError:
-    print(f"Only {counter} files were loaded.")
-    '''
+# Calculate the new size to maintain the aspect ratio
+new_width = int(original_width * scaling_factor)
+new_height = int(original_height * scaling_factor)
+
+# Resize the image while maintaining the aspect ratio
+resized_image = cv2.resize(original_image, (new_width, new_height))
+
+# Create a new image with the target size and paste the resized image in the center
+output_image = np.full((target_size[1], target_size[0], 3), 255, dtype=np.uint8)
+x_offset = (target_size[0] - new_width) // 2
+y_offset = (target_size[1] - new_height) // 2
+output_image[y_offset:y_offset + new_height, x_offset:x_offset + new_width] = resized_image
+
+cv2.imshow('Sample', output_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
