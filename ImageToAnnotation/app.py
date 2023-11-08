@@ -48,13 +48,13 @@ class App:
 
             self.xmin_label.place(relx=0.15, rely=0.025)
             self.xmax_label.place(relx=0.25, rely=0.025)
-            self.ymin_label.place(relx=0.15, rely=0.045)
-            self.ymax_label.place(relx=0.25, rely=0.045)
+            self.ymin_label.place(relx=0.15, rely=0.05)
+            self.ymax_label.place(relx=0.25, rely=0.05)
 
             self.xmin_value.place(relx=0.2, rely=0.025)
             self.xmax_value.place(relx=0.3, rely=0.025)
-            self.ymin_value.place(relx=0.2, rely=0.045)
-            self.ymax_value.place(relx=0.3, rely=0.045)
+            self.ymin_value.place(relx=0.2, rely=0.05)
+            self.ymax_value.place(relx=0.3, rely=0.05)
 
             self.canvas = tk.Canvas(self.root, width= 416, height= 416, bg= "white")
             self.canvas.place(relx=0.05, rely=0.1)
@@ -80,30 +80,6 @@ class App:
             self.xmin_value.config(text= f"{self.start_pos[0]}")
             self.ymin_value.config(text= f"{self.start_pos[1]}")
 
-      def resize_image(self, img):
-            canvas_height, canvas_width = 416, 416
-            img_height, img_width,  _ = img.shape
-            width_scale = canvas_width / img_width
-            height_scale = canvas_height / img_height
-
-            # Determine the scaling factor to maintain the aspect ratio
-            scaling_factor = min(width_scale, height_scale)
-
-            # Calculate the new size to maintain the aspect ratio
-            new_width = int(img_width * scaling_factor)
-            new_height = int(img_height * scaling_factor)
-
-            # Resize the image while maintaining the aspect ratio
-            resized_image = cv.resize(img, (new_width, new_height))
-
-            # Create a new image with the target size and paste the resized image in the center
-            output_image = np.full((canvas_height, canvas_width, 3), 255, dtype=np.uint8)
-            x_offset = (canvas_width - new_width) // 2
-            y_offset = (canvas_height - new_height) // 2
-            output_image[y_offset:y_offset + new_height, x_offset:x_offset + new_width] = resized_image
-
-            return output_image
-
       def create_box(self, event):
             self.final_pos = (event.x, event.y)
             self.xmax_value.config(text=f"{self.final_pos[0]}")
@@ -120,7 +96,7 @@ class App:
             for i, f in enumerate(self.file_path_list):
                   img = cv.imread(f)
                   img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-                  img = Image.fromarray(self.resize_image(img))
+                  img = Image.fromarray(img)
                   img = ImageTk.PhotoImage(img)
                   self.image.append(img)
 
