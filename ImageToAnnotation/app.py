@@ -31,7 +31,8 @@ class App:
             self.progress_label = tk.Label(self.root, text= "0%")
             self.progress_label.place(relx=0.05, rely=0.9)
 
-            self.object_text = tk.Entry(self.root)
+            v = tk.StringVar()
+            self.object_text = tk.Entry()
             self.object_text.place(relx= 0.7, rely=0.1)
 
             self.save_btn = tk.Button(self.root, text= 'Save', command= self.save)
@@ -39,6 +40,14 @@ class App:
 
             self.saved_status_label = tk.Label(self.root, text= "")
             self.saved_status_label.place(relx= 0.7, rely=0.2)
+
+            self.difficult_detect = tk.Checkbutton(self.root, text= "Difficult")
+            self.truncated = tk.Checkbutton(self.root, text= "Truncated")
+            self.occluded = tk.Checkbutton(self.root, text= "Occluded")
+
+            self.difficult_detect.place(relx= 0.7, rely= 0.25)
+            self.truncated.place(relx= 0.7, rely= 0.3)
+            self.occluded.place(relx=0.7, rely= 0.35)
 
 
             if self.xmin_value and self.xmax_value and self.ymin_value and self.ymax_value:
@@ -69,6 +78,7 @@ class App:
             self.file_path_list = []
             self.image = []
             self.index = 0
+            self.labels = []
             self.image_loading_complete = threading.Event()
 
       def save(self):
@@ -117,11 +127,13 @@ class App:
             if dir_path:
                   img_paths = []
                   for folder in os.listdir(dir_path):
+                        self.labels.append(folder)
                         folder = os.path.join(dir_path, folder)
                         files = os.path.join(folder, "*.jpg")
                         print(f"Loading {folder}")
                         [self.file_path_list.append(e) for e in glob.glob(files)]
-                        
+
+                  print(self.labels)      
                   self.next_btn.config(state= 'disabled')
                   threading.Thread(target= self.load_images).start()
                   self.image_loading_complete.clear()
@@ -132,6 +144,9 @@ class App:
       def next_image(self):
             self.image_loading_complete.wait()
             self.saved_status_label.config(text=" ")
+            self.difficult_detect.deselect()
+            self.truncated.deselect()
+            self.occluded.deselect()
             if self.index < len(self.image):
                   if self.current_image:
                         self.canvas.delete("image")
