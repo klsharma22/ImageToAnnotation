@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 
-def create_annotation(path, bnd_dim, check_box_values):
+def create_annotation(path, objects):
     root = ET.Element('annotation')
     path_components = path.split('/')
     folder_text = path_components[-2]
@@ -8,15 +8,6 @@ def create_annotation(path, bnd_dim, check_box_values):
     width_value = 416
     height_value = 416
     channels_value = 3
-    object_name_text = folder_text
-    xmin_value = min(bnd_dim[0], bnd_dim[2])
-    ymin_value = min(bnd_dim[1], bnd_dim[3])
-    xmax_value = max(bnd_dim[0], bnd_dim[2])
-    ymax_value = max(bnd_dim[1], bnd_dim[3])
-
-    difficult_value = check_box_values[0]
-    truncated_value = check_box_values[1]
-    occluded_value = check_box_values[2]
 
     folder = ET.SubElement(root, 'folder')
     folder.text = folder_text
@@ -32,27 +23,32 @@ def create_annotation(path, bnd_dim, check_box_values):
     channel = ET.SubElement(size, 'channel')
     channel.text = str(channels_value)
 
-    object = ET.SubElement(root, 'object')
-    name = ET.SubElement(object, 'name')
-    name.text = object_name_text
+    for obj in objects:
+        object = ET.SubElement(root, 'object')
+        name = ET.SubElement(object, 'name')
+        name.text = obj['name']
 
-    difficult = ET.SubElement(object, 'difficult')
-    difficult.text = str(difficult_value)
-    truncate = ET.SubElement(object, 'truncated')
-    truncate.text = str(truncated_value)
-    occluded = ET.SubElement(object, 'occluded')
-    occluded.text = str(occluded_value)
+        difficult = ET.SubElement(object, 'difficult')
+        difficult.text = str(obj['check_box'][0])
+        truncate = ET.SubElement(object, 'truncated')
+        truncate.text = str(obj['check_box'][1])
+        occluded = ET.SubElement(object, 'occluded')
+        occluded.text = str(obj['check_box'][2])
 
-    bnd_box = ET.SubElement(object, 'bndbox')
-    xmin = ET.SubElement(bnd_box, 'xmin')
-    xmin.text = str(xmin_value)
-    ymin = ET.SubElement(bnd_box, 'ymin')
-    ymin.text = str(ymin_value)
-    xmax = ET.SubElement(bnd_box, 'xmax')
-    xmax.text = str(xmax_value)
-    ymax = ET.SubElement(bnd_box, 'ymax')
-    ymax.text = str(ymax_value)
+        bnd_box = ET.SubElement(object, 'bndbox')
+        xmin = ET.SubElement(bnd_box, 'xmin')
+        xmin.text = str(min(obj['bnd_dim'][0], obj['bnd_dim'][2]))
+        ymin = ET.SubElement(bnd_box, 'ymin')
+        ymin.text = str(min(obj['bnd_dim'][1], obj['bnd_dim'][3]))
+        xmax = ET.SubElement(bnd_box, 'xmax')
+        xmax.text = str(max(obj['bnd_dim'][0], obj['bnd_dim'][2]))
+        ymax = ET.SubElement(bnd_box, 'ymax')
+        ymax.text = str(max(obj['bnd_dim'][1], obj['bnd_dim'][3]))
 
     tree = ET.ElementTree(root)
-    tree.write(filename_text.split('.')[0] + '.xml')
+    new_path = "/".join(path_components[:-1])
+    new_path += "/" + filename_text.split(".")[0] + ".xml"
+    tree.write(new_path)
 
+
+#create_annotation('/Users/klsharma22/Desktop/NextGenTechInc/Object Detection/Model/Custom-made/data/gerenuk/image_0034.jpg',[{'name': 'gerunk', 'bnd_dim': [0, 0, 0, 0], 'check_box': [0, 0, 0]}, {'name': 'gerunk', 'bnd_dim': [0, 0, 0, 0], 'check_box': [0, 0, 0]}])

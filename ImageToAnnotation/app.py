@@ -86,17 +86,31 @@ class App:
             self.file_path_list = []
             self.image = []
             self.index = 0
+            self.objects = []
             self.image_loading_complete = threading.Event()
 
 
       def add_boundary(self):
+            object_dict = {'name': self.object_text.get(),
+                           'bnd_dim': [self.start_pos[0], self.start_pos[1], self.final_pos[0], self.final_pos[1]],
+                           'check_box': [self.dd.get(), self.t.get(), self.o.get()]}
+            self.objects.append(object_dict)
+            self.reset()
+
+      def reset(self):
+            self.canvas.delete(self.current_box)
+            self.current_box = None
+            self.start_pos = None
+            self.final_pos = None
+            self.object_text.delete(0, 'end')
+            print(self.objects)
             pass
-      
+
       def save(self):
             an.create_annotation(self.file_path_list[self.index], 
-                                 [self.start_pos[0], self.start_pos[1], self.final_pos[0], self.final_pos[1]],
-                                 [self.dd.get(), self.t.get(), self.o.get()])
+                                 self.objects)
             self.saved_status_label.config(text= 'Saved')
+            self.objects = []
 
 
       def mouse_init(self, event):
