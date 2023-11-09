@@ -37,10 +37,13 @@ class App:
             self.object_text.place(relx= 0.7, rely=0.1)
 
             self.save_btn = tk.Button(self.root, text= 'Save', command= self.save)
-            self.save_btn.place(relx=0.7, rely=0.15)
+            self.save_btn.place(relx=0.7, rely=0.2)
 
             self.saved_status_label = tk.Label(self.root, text= "")
-            self.saved_status_label.place(relx= 0.7, rely=0.2)
+            self.saved_status_label.place(relx= 0.7, rely=0.25)
+
+            self.add_btn = tk.Button(self.root, text= 'Add Boundary', command= self.add_boundary)
+            self.add_btn.place(relx=0.7, rely=0.15)
 
             self.dd = tk.IntVar()
             self.t = tk.IntVar()
@@ -85,6 +88,10 @@ class App:
             self.index = 0
             self.image_loading_complete = threading.Event()
 
+
+      def add_boundary(self):
+            pass
+      
       def save(self):
             an.create_annotation(self.file_path_list[self.index], 
                                  [self.start_pos[0], self.start_pos[1], self.final_pos[0], self.final_pos[1]],
