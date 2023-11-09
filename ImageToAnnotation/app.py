@@ -9,6 +9,7 @@ import cv2 as cv
 import threading
 import time
 import numpy as np
+import annotation as an
 
 
 class App:
@@ -41,9 +42,13 @@ class App:
             self.saved_status_label = tk.Label(self.root, text= "")
             self.saved_status_label.place(relx= 0.7, rely=0.2)
 
-            self.difficult_detect = tk.Checkbutton(self.root, text= "Difficult")
-            self.truncated = tk.Checkbutton(self.root, text= "Truncated")
-            self.occluded = tk.Checkbutton(self.root, text= "Occluded")
+            self.dd = tk.IntVar()
+            self.t = tk.IntVar()
+            self.o = tk.IntVar()
+
+            self.difficult_detect = tk.Checkbutton(self.root, text= "Difficult", variable= self.dd)
+            self.truncated = tk.Checkbutton(self.root, text= "Truncated", variable= self.t)
+            self.occluded = tk.Checkbutton(self.root, text= "Occluded", variable= self.o)
 
             self.difficult_detect.place(relx= 0.7, rely= 0.25)
             self.truncated.place(relx= 0.7, rely= 0.3)
@@ -78,10 +83,12 @@ class App:
             self.file_path_list = []
             self.image = []
             self.index = 0
-            self.labels = []
             self.image_loading_complete = threading.Event()
 
       def save(self):
+            an.create_annotation(self.file_path_list[self.index], 
+                                 [self.start_pos[0], self.start_pos[1], self.final_pos[0], self.final_pos[1]],
+                                 [self.dd.get(), self.t.get(), self.o.get()])
             self.saved_status_label.config(text= 'Saved')
 
 
@@ -127,13 +134,10 @@ class App:
             if dir_path:
                   img_paths = []
                   for folder in os.listdir(dir_path):
-                        self.labels.append(folder)
                         folder = os.path.join(dir_path, folder)
                         files = os.path.join(folder, "*.jpg")
                         print(f"Loading {folder}")
-                        [self.file_path_list.append(e) for e in glob.glob(files)]
-
-                  print(self.labels)      
+                        [self.file_path_list.append(e) for e in glob.glob(files)]    
                   self.next_btn.config(state= 'disabled')
                   threading.Thread(target= self.load_images).start()
                   self.image_loading_complete.clear()
@@ -147,6 +151,7 @@ class App:
             self.difficult_detect.deselect()
             self.truncated.deselect()
             self.occluded.deselect()
+
             if self.index < len(self.image):
                   if self.current_image:
                         self.canvas.delete("image")
