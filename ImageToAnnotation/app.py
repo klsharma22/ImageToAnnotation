@@ -105,7 +105,6 @@ class App:
             self.start_pos = None
             self.final_pos = None
             self.object_text.set('Select an option')
-            print(self.objects)
             pass
 
       def save(self):
