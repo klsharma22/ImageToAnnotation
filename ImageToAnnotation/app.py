@@ -32,8 +32,9 @@ class App:
             self.progress_label = tk.Label(self.root, text= "0%")
             self.progress_label.place(relx=0.05, rely=0.9)
 
-            v = tk.StringVar()
-            self.object_text = tk.Entry()
+            self.name = tk.StringVar()
+            self.object_text = ttk.Combobox(self.root, textvariable= self.name)
+            self.object_text.set('Select an option')
             self.object_text.place(relx= 0.7, rely=0.1)
 
             self.save_btn = tk.Button(self.root, text= 'Save', command= self.save)
@@ -87,6 +88,7 @@ class App:
             self.image = []
             self.index = 0
             self.objects = []
+            self.object_name_list = []
             self.image_loading_complete = threading.Event()
 
 
@@ -102,7 +104,7 @@ class App:
             self.current_box = None
             self.start_pos = None
             self.final_pos = None
-            self.object_text.delete(0, 'end')
+            self.object_text.set('Select an option')
             print(self.objects)
             pass
 
@@ -155,11 +157,13 @@ class App:
             if dir_path:
                   img_paths = []
                   for folder in os.listdir(dir_path):
+                        self.object_name_list.append(folder)
                         folder = os.path.join(dir_path, folder)
                         files = os.path.join(folder, "*.jpg")
                         print(f"Loading {folder}")
                         [self.file_path_list.append(e) for e in glob.glob(files)]    
                   self.next_btn.config(state= 'disabled')
+                  self.object_text['values'] = tuple(self.object_name_list)
                   threading.Thread(target= self.load_images).start()
                   self.image_loading_complete.clear()
                   self.root.update_idletasks()
