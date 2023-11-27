@@ -41,7 +41,7 @@ class App:
             self.save_btn.place(relx=0.7, rely=0.2)
 
             self.saved_status_label = tk.Label(self.root, text= "")
-            self.saved_status_label.place(relx= 0.7, rely=0.25)
+            self.saved_status_label.place(relx= 0.8, rely=0.2)
 
             self.add_btn = tk.Button(self.root, text= 'Add Boundary', command= self.add_boundary)
             self.add_btn.place(relx=0.7, rely=0.15)
@@ -104,6 +104,9 @@ class App:
             self.current_box = None
             self.start_pos = None
             self.final_pos = None
+            self.difficult_detect.deselect()
+            self.truncated.deselect()
+            self.occluded.deselect()
             self.object_text.set('Select an option')
             pass
 
